@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brainbreak — Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#overview" aria-label="Brainbreak home">
+          <span class="brand-mark">B</span>
+          <span class="brand-word">brainbreak</span>
+        </a>
+        <nav aria-label="Dashboard sections">
+          <a class="nav-item active" href="#overview"><span>⌁</span>Overview</a>
+          <a class="nav-item" href="#skills"><span>↗</span>Skill levels</a>
+          <a class="nav-item" href="#routine"><span>⚙</span>Routine</a>
+          <a class="nav-item" href="#history"><span>◷</span>History</a>
+        </nav>
+        <div class="sidebar-status">
+          <span class="status-light"></span>
+          <div>
+            <strong id="sidebar-status-title">Routine active</strong>
+            <small id="sidebar-status-copy">Only while Chrome is open</small>
+          </div>
+        </div>
+      </aside>
+
+      <main>
+        <header class="page-header">
+          <div>
+            <p class="kicker" id="date-label"></p>
+            <h1>Keep your mind moving.</h1>
+          </div>
+          <button class="quiet-button" id="pause-routine" type="button">
+            <span class="button-status-dot"></span>
+            <span id="pause-label">Pause routine</span>
+          </button>
+        </header>
+
+        <section class="overview-section" id="overview">
+          <article class="hero-card reveal-one">
+            <div class="hero-copy">
+              <span class="eyebrow">ADAPTIVE BRAIN TRAINING</span>
+              <h2>A sharper break from the scroll.</h2>
+              <p>Brainbreak interrupts browsing with a short set of arithmetic and memory drills. Solve the set, then get your tab back.</p>
+              <div class="hero-actions">
+                <button class="primary-button" id="train-now" type="button">Start a practice set <span>→</span></button>
+                <a class="text-link" href="#routine">Adjust the mix</a>
+              </div>
+            </div>
+            <div class="next-card">
+              <div class="orbit" aria-hidden="true"><span>+</span><i>×</i><b>÷</b></div>
+              <span class="next-label">NEXT INTERRUPTION</span>
+              <strong id="next-countdown">Scheduling…</strong>
+              <small id="next-meta">Your adaptive mix</small>
+            </div>
+          </article>
+
+          <div class="stats-grid reveal-two">
+            <article class="stat-card dark">
+              <span>Sessions today</span>
+              <strong id="today-sessions">0</strong>
+              <small>Completed brainbreaks</small>
+            </article>
+            <article class="stat-card">
+              <span>Answer accuracy</span>
+              <strong id="today-accuracy">—</strong>
+              <small>Today, including retries</small>
+            </article>
+            <article class="stat-card">
+              <span>Average response</span>
+              <strong id="today-response">—</strong>
+              <small>Per completed challenge</small>
+            </article>
+            <article class="stat-card">
+              <span>Daily streak</span>
+              <strong><span id="daily-streak">0</span><em> days</em></strong>
+              <small>Consistency beats intensity</small>
+            </article>
+          </div>
+        </section>
+
+        <section class="section-block" id="skills">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">YOUR EDGE</span>
+              <h2>Skill levels</h2>
+              <p>Every skill adapts independently, so strengths accelerate without leaving weaker areas behind.</p>
+            </div>
+            <span class="level-summary" id="level-summary">6 skills · Level 1 average</span>
+          </div>
+          <div class="skill-grid" id="skill-grid"></div>
+        </section>
+
+        <section class="section-block" id="routine">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">MAKE IT YOURS</span>
+              <h2>Training routine</h2>
+              <p>Choose exactly what appears in each interruption. Difficulty always follows your performance.</p>
+            </div>
+          </div>
+          <form class="routine-panel" id="routine-form">
+            <div class="routine-controls">
+              <label>
+                <span>Interrupt every</span>
+                <div class="number-control"><input name="interval" type="number" min="1" max="1440" required><b>minutes</b></div>
+              </label>
+              <label>
+                <span>Set length</span>
+                <div class="number-control"><input name="questionCount" type="number" min="3" max="20" required><b>challenges</b></div>
+              </label>
+              <div class="adaptive-note">
+                <span class="adaptive-icon">↗</span>
+                <div><strong>Adaptive difficulty is on</strong><small>Clean, quick answers build mastery fastest.</small></div>
+              </div>
+            </div>
+
+            <div class="mix-heading">
+              <div><strong>Your training mix</strong><small>Select at least one skill</small></div>
+              <button class="selection-button" id="select-all" type="button">Select all</button>
+            </div>
+            <div class="skill-options">
+              <label class="skill-option" data-option="addition">
+                <input type="checkbox" data-skill="addition">
+                <span class="option-check">✓</span><i>+</i>
+                <span><strong>Addition</strong><small>Build speed with sums</small></span>
+              </label>
+              <label class="skill-option" data-option="subtraction">
+                <input type="checkbox" data-skill="subtraction">
+                <span class="option-check">✓</span><i>−</i>
+                <span><strong>Subtraction</strong><small>Train number differences</small></span>
+              </label>
+              <label class="skill-option" data-option="multiplication">
+                <input type="checkbox" data-skill="multiplication">
+                <span class="option-check">✓</span><i>×</i>
+                <span><strong>Multiplication</strong><small>Strengthen mental products</small></span>
+              </label>
+              <label class="skill-option" data-option="division">
+                <input type="checkbox" data-skill="division">
+                <span class="option-check">✓</span><i>÷</i>
+                <span><strong>Division</strong><small>Practice exact quotients</small></span>
+              </label>
+              <label class="skill-option" data-option="digits">
+                <input type="checkbox" data-skill="digits">
+                <span class="option-check">✓</span><i class="wide-icon">123</i>
+                <span><strong>Number recall</strong><small>Remember ordered digits</small></span>
+              </label>
+              <label class="skill-option" data-option="sentence">
+                <input type="checkbox" data-skill="sentence">
+                <span class="option-check">✓</span><i class="wide-icon">Aa</i>
+                <span><strong>Sentence recall</strong><small>Hold words in sequence</small></span>
+              </label>
+            </div>
+            <div class="routine-footer">
+              <p id="routine-summary">6 skills will rotate through each set.</p>
+              <button class="primary-button save-button" type="submit">Save routine</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="section-block history-section" id="history">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">RECENT WORK</span>
+              <h2>Session history</h2>
+              <p>Your latest completed sets and level changes. Everything stays in Chrome local storage.</p>
+            </div>
+          </div>
+          <div class="history-list" id="history-list"></div>
+        </section>
+      </main>
+    </div>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <script src="trainer.js"></script>
+    <script src="dashboard.js"></script>
+  </body>
+</html>
