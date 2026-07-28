@@ -15,6 +15,25 @@
   let memoryTimeout = null;
   let previousOverflow = null;
 
+  function containOverlayKeyboardEvent(event) {
+    event.stopPropagation();
+  }
+
+  function blockPageKeyboardHandlers(event) {
+    if (!activeSession) return;
+
+    // This listener is installed at document_start, before page-level shortcut
+    // handlers. Stopping propagation does not cancel the focused control's
+    // native behavior, so typing, tabbing, and button activation keep working.
+    event.stopImmediatePropagation();
+  }
+
+  function isolateOverlayKeyboard() {
+    ["keydown", "keypress", "keyup"].forEach((type) => {
+      shadow.addEventListener(type, containOverlayKeyboardEvent);
+    });
+  }
+
   function clearMemoryTimers() {
     if (memoryInterval) clearInterval(memoryInterval);
     if (memoryTimeout) clearTimeout(memoryTimeout);
@@ -128,6 +147,7 @@
     value.classList.toggle("digits", challenge.memoryType === "digits");
     const button = stage.querySelector("button");
     button.addEventListener("click", () => showRecall(challenge));
+    setTimeout(() => button.focus(), 80);
 
     const duration = Math.max(2, seconds) * 1000;
     const endsAt = Date.now() + duration;
@@ -310,6 +330,7 @@
     host = document.createElement("div");
     host.id = "brainbreak-root";
     shadow = host.attachShadow({ mode: "closed" });
+    isolateOverlayKeyboard();
     shadow.innerHTML = `
       <style>
         :host{all:initial;position:fixed;inset:0;z-index:2147483647;color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
@@ -397,6 +418,10 @@
   chrome.runtime.onMessage.addListener((message) => {
     if (message.type === "SHOW_SESSION") renderSession(message.session);
     if (message.type === "DISMISS_SESSION") closeSession(message.sessionId);
+  });
+
+  ["keydown", "keypress", "keyup"].forEach((type) => {
+    window.addEventListener(type, blockPageKeyboardHandlers, true);
   });
 
   chrome.runtime.sendMessage({ type: "CONTENT_READY" }).catch(() => {});

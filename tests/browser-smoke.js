@@ -310,13 +310,48 @@ async function testMemoryBlocker(client, errors) {
   await navigate(client, "data:text/html,<title>Sentence test page</title><main><h1>Browsing page</h1></main>");
   await evaluate(client, fs.readFileSync(path.join(root, "trainer.js"), "utf8"));
   await evaluate(client, fs.readFileSync(path.join(root, "content.js"), "utf8"));
-  const sentenceAccepted = await evaluate(client, `(async () => {
+  await evaluate(client, `(() => {
+    globalThis.__underlyingKeyboardEvents = [];
+    ["keydown", "keypress", "keyup"].forEach((type) => {
+      document.addEventListener(type, (event) => {
+        globalThis.__underlyingKeyboardEvents.push({ type, key: event.key });
+        if (event.key === " ") event.preventDefault();
+      }, true);
+    });
     const skills = Object.fromEntries(Object.keys(BrainbreakTrainer.SKILLS).map((key) => [key, key === "sentence"]));
     const settings = BrainbreakTrainer.normalizeSettings({ enabled: true, interval: 30, questionCount: 3, skills });
     const profiles = BrainbreakTrainer.normalizeProfiles({ sentence: { level: 6 } });
     __brainListener({ type: "SHOW_SESSION", session: { id: "sentence-smoke", scheduledAt: Date.now(), settings, profiles } });
     const root = document.querySelector("#brainbreak-root");
     root.shadowRoot.querySelector(".secondary-button").click();
+  })()`);
+  await wait(100);
+  await client.send("Input.dispatchKeyEvent", {
+    type: "keyDown",
+    key: " ",
+    code: "Space",
+    text: " ",
+  });
+  await client.send("Input.dispatchKeyEvent", {
+    type: "keyUp",
+    key: " ",
+    code: "Space",
+  });
+  const keyboardIsolation = await evaluate(client, `(() => {
+    const root = document.querySelector("#brainbreak-root");
+    return {
+      value: root.shadowRoot.querySelector("[name=answer]").value,
+      leakedEvents: globalThis.__underlyingKeyboardEvents
+    };
+  })()`);
+  assert.equal(keyboardIsolation.value, " ", "space is entered in the recall field");
+  assert.deepEqual(keyboardIsolation.leakedEvents, [], "overlay keystrokes do not reach the blocked page");
+
+  const sentenceAccepted = await evaluate(client, `(async () => {
+    const skills = Object.fromEntries(Object.keys(BrainbreakTrainer.SKILLS).map((key) => [key, key === "sentence"]));
+    const settings = BrainbreakTrainer.normalizeSettings({ enabled: true, interval: 30, questionCount: 3, skills });
+    const profiles = BrainbreakTrainer.normalizeProfiles({ sentence: { level: 6 } });
+    const root = document.querySelector("#brainbreak-root");
     const challenge = BrainbreakTrainer.createSessionPlan(settings, profiles, "sentence-smoke")[0];
     const form = root.shadowRoot.querySelector(".answer-form");
     const usedTextarea = form.elements.answer.tagName === "TEXTAREA";
